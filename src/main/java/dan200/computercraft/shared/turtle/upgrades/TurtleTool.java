@@ -7,6 +7,7 @@ package dan200.computercraft.shared.turtle.upgrades;
 
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.AbstractTurtleUpgrade;
+import dan200.computercraft.api.client.TransformedModel;
 import dan200.computercraft.api.turtle.*;
 import dan200.computercraft.api.turtle.event.TurtleAttackEvent;
 import dan200.computercraft.api.turtle.event.TurtleBlockEvent;
@@ -19,10 +20,8 @@ import dan200.computercraft.shared.util.WorldUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.TransformationMatrix;
-import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.ArmorStandEntity;
@@ -72,7 +71,7 @@ public class TurtleTool extends AbstractTurtleUpgrade
     @Nonnull
     @Override
     @OnlyIn( Dist.CLIENT )
-    public Pair<IBakedModel, TransformationMatrix> getModel( ITurtleAccess turtle, @Nonnull TurtleSide side )
+    public TransformedModel getModel( ITurtleAccess turtle, @Nonnull TurtleSide side )
     {
         float xOffset = side == TurtleSide.Left ? -0.40625f : 0.40625f;
         Matrix4f transform = new Matrix4f( new float[] {
@@ -81,11 +80,7 @@ public class TurtleTool extends AbstractTurtleUpgrade
             0.0f, -1.0f, 0.0f, 1.0f,
             0.0f, 0.0f, 0.0f, 1.0f
         } );
-        Minecraft mc = Minecraft.getInstance();
-        return Pair.of(
-            mc.getItemRenderer().getItemModelMesher().getItemModel( getCraftingItem() ),
-            new TransformationMatrix( transform )
-        );
+        return TransformedModel.of( getCraftingItem(), new TransformationMatrix( transform ) );
     }
 
     @Nonnull

@@ -8,15 +8,12 @@ package dan200.computercraft.shared.turtle.upgrades;
 
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.AbstractTurtleUpgrade;
+import dan200.computercraft.api.client.TransformedModel;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.api.turtle.TurtleSide;
 import dan200.computercraft.api.turtle.TurtleUpgradeType;
 import dan200.computercraft.shared.peripheral.speaker.SpeakerPeripheral;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.TransformationMatrix;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelManager;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -24,7 +21,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 
@@ -89,12 +85,10 @@ public class TurtleSpeaker extends AbstractTurtleUpgrade
     @Nonnull
     @Override
     @OnlyIn( Dist.CLIENT )
-    public Pair<IBakedModel, TransformationMatrix> getModel( ITurtleAccess turtle, @Nonnull TurtleSide side )
+    public TransformedModel getModel( ITurtleAccess turtle, @Nonnull TurtleSide side )
     {
         loadModelLocations();
-        ModelManager modelManager = Minecraft.getInstance().getItemRenderer().getItemModelMesher().getModelManager();
-
-        return Pair.of( modelManager.getModel( side == TurtleSide.Left ? m_leftModel : m_rightModel ), null );
+        return TransformedModel.of( side == TurtleSide.Left ? m_leftModel : m_rightModel );
     }
 
     @Override

@@ -6,11 +6,10 @@
 package dan200.computercraft.api.turtle;
 
 import dan200.computercraft.api.ComputerCraftAPI;
+import dan200.computercraft.api.client.TransformedModel;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.event.TurtleAttackEvent;
 import dan200.computercraft.api.turtle.event.TurtleBlockEvent;
-import net.minecraft.client.renderer.TransformationMatrix;
-import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
@@ -19,7 +18,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.world.BlockEvent;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -126,12 +124,11 @@ public interface ITurtleUpgrade
      *
      * @param turtle Access to the turtle that the upgrade resides on. This will be null when getting item models!
      * @param side   Which side of the turtle (left or right) the upgrade resides on.
-     * @return The model that you wish to be used to render your upgrade, and a transformation to apply to it. Returning
-     * a transformation of {@code null} has the same effect as the identify matrix.
+     * @return The model that you wish to be used to render your upgrade.
      */
     @Nonnull
     @OnlyIn( Dist.CLIENT )
-    Pair<IBakedModel, TransformationMatrix> getModel( @Nullable ITurtleAccess turtle, @Nonnull TurtleSide side );
+    TransformedModel getModel( @Nullable ITurtleAccess turtle, @Nonnull TurtleSide side );
 
     /**
      * Called once per tick for each turtle which has the upgrade equipped.

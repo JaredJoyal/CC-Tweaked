@@ -7,14 +7,11 @@ package dan200.computercraft.shared.turtle.upgrades;
 
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.AbstractTurtleUpgrade;
+import dan200.computercraft.api.client.TransformedModel;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 import dan200.computercraft.shared.peripheral.modem.ModemState;
 import dan200.computercraft.shared.peripheral.modem.wireless.WirelessModemPeripheral;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.TransformationMatrix;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelManager;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
@@ -24,7 +21,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 
@@ -129,7 +125,7 @@ public class TurtleModem extends AbstractTurtleUpgrade
     @Nonnull
     @Override
     @OnlyIn( Dist.CLIENT )
-    public Pair<IBakedModel, TransformationMatrix> getModel( ITurtleAccess turtle, @Nonnull TurtleSide side )
+    public TransformedModel getModel( ITurtleAccess turtle, @Nonnull TurtleSide side )
     {
         loadModelLocations();
 
@@ -137,13 +133,12 @@ public class TurtleModem extends AbstractTurtleUpgrade
         if( turtle != null )
         {
             CompoundNBT turtleNBT = turtle.getUpgradeNBTData( side );
-            if( turtleNBT.contains( "active" ) ) active = turtleNBT.getBoolean( "active" );
+            active = turtleNBT.contains( "active" ) && turtleNBT.getBoolean( "active" );
         }
 
-        ModelManager modelManager = Minecraft.getInstance().getItemRenderer().getItemModelMesher().getModelManager();
         return side == TurtleSide.Left
-            ? Pair.of( modelManager.getModel( active ? m_leftOnModel : m_leftOffModel ), null )
-            : Pair.of( modelManager.getModel( active ? m_rightOnModel : m_rightOffModel ), null );
+            ? TransformedModel.of( active ? m_leftOnModel : m_leftOffModel )
+            : TransformedModel.of( active ? m_rightOnModel : m_rightOffModel );
     }
 
     @Override

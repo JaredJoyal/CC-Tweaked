@@ -71,21 +71,6 @@ public final class PrintoutRenderer
         }
     }
 
-    public static void drawText( int x, int y, int start, String[] text, String[] colours )
-    {
-        RenderSystem.color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-        RenderSystem.enableBlend();
-        RenderSystem.enableTexture();
-        RenderSystem.blendFuncSeparate( SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO );
-
-        FixedWidthFontRenderer fontRenderer = FixedWidthFontRenderer.instance();
-
-        for( int line = 0; line < LINES_PER_PAGE && line < text.length; line++ )
-        {
-            fontRenderer.drawString( new TextBuffer( text[start + line] ), x, y + line * FONT_HEIGHT, new TextBuffer( colours[start + line] ), null, 0, 0, false, Palette.DEFAULT );
-        }
-    }
-
     public static void drawBorder( double x, double y, double z, int page, int pages, boolean isBook )
     {
         RenderSystem.color4f( 1.0f, 1.0f, 1.0f, 1.0f );

@@ -6,6 +6,7 @@
 package dan200.computercraft.client;
 
 import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.client.render.TurtleModelLoader;
 import dan200.computercraft.shared.common.IColouredItem;
 import dan200.computercraft.shared.media.items.ItemDisk;
 import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
@@ -13,6 +14,7 @@ import dan200.computercraft.shared.util.Colour;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -20,6 +22,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.SimpleModelTransform;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -67,13 +70,13 @@ public final class ClientRegistry
     @SubscribeEvent
     public static void registerModels( ModelRegistryEvent event )
     {
-        // TODO: ModelLoaderRegistry.registerLoader( new ResourceLocation( ComputerCraft.MOD_ID, "turtle" ), TurtleModelLoader.INSTANCE );
+        ModelLoaderRegistry.registerLoader( new ResourceLocation( ComputerCraft.MOD_ID, "turtle" ), TurtleModelLoader.INSTANCE );
     }
 
     @SubscribeEvent
     public static void onTextureStitchEvent( TextureStitchEvent.Pre event )
     {
-        // TODO: if( event.getMap() != Minecraft.getInstance().getTextureManager() ) return;
+        if( !event.getMap().getBasePath().equals( PlayerContainer.LOCATION_BLOCKS_TEXTURE ) ) return;
 
         for( String extra : EXTRA_TEXTURES )
         {
@@ -93,8 +96,12 @@ public final class ClientRegistry
             ResourceLocation location = new ResourceLocation( ComputerCraft.MOD_ID, "item/" + modelName );
             IUnbakedModel model = loader.getUnbakedModel( location );
             model.func_225614_a_( loader::getUnbakedModel, new HashSet<>() );
+
             IBakedModel baked = model.func_225613_a_( loader, ModelLoader.defaultTextureGetter(), SimpleModelTransform.IDENTITY, location );
-            if( baked != null ) registry.put( new ModelResourceLocation( location, "inventory" ), baked );
+            if( baked != null )
+            {
+                registry.put( new ModelResourceLocation( new ResourceLocation( ComputerCraft.MOD_ID, modelName ), "inventory" ), baked );
+            }
         }
     }
 
