@@ -5,7 +5,7 @@
  */
 package dan200.computercraft.client.gui;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import dan200.computercraft.core.terminal.TextBuffer;
 import dan200.computercraft.shared.util.Palette;
 import net.minecraft.client.Minecraft;
@@ -25,6 +25,7 @@ public final class FixedWidthFontRenderer
 
     public static final int FONT_HEIGHT = 9;
     public static final int FONT_WIDTH = 6;
+    public static final float WIDTH = 256.0f;
 
     private static FixedWidthFontRenderer instance;
 
@@ -63,12 +64,12 @@ public final class FixedWidthFontRenderer
         int xStart = 1 + column * (FONT_WIDTH + 2);
         int yStart = 1 + row * (FONT_HEIGHT + 2);
 
-        renderer.pos( x, y, 0.0 ).tex( xStart / 256.0, yStart / 256.0 ).color( r, g, b, 1.0f ).endVertex();
-        renderer.pos( x, y + FONT_HEIGHT, 0.0 ).tex( xStart / 256.0, (yStart + FONT_HEIGHT) / 256.0 ).color( r, g, b, 1.0f ).endVertex();
-        renderer.pos( x + FONT_WIDTH, y, 0.0 ).tex( (xStart + FONT_WIDTH) / 256.0, yStart / 256.0 ).color( r, g, b, 1.0f ).endVertex();
-        renderer.pos( x + FONT_WIDTH, y, 0.0 ).tex( (xStart + FONT_WIDTH) / 256.0, yStart / 256.0 ).color( r, g, b, 1.0f ).endVertex();
-        renderer.pos( x, y + FONT_HEIGHT, 0.0 ).tex( xStart / 256.0, (yStart + FONT_HEIGHT) / 256.0 ).color( r, g, b, 1.0f ).endVertex();
-        renderer.pos( x + FONT_WIDTH, y + FONT_HEIGHT, 0.0 ).tex( (xStart + FONT_WIDTH) / 256.0, (yStart + FONT_HEIGHT) / 256.0 ).color( r, g, b, 1.0f ).endVertex();
+        renderer.pos( x, y, 0.0 ).tex( xStart / WIDTH, yStart / WIDTH ).color( r, g, b, 1.0f ).endVertex();
+        renderer.pos( x, y + FONT_HEIGHT, 0.0 ).tex( xStart / WIDTH, (yStart + FONT_HEIGHT) / WIDTH ).color( r, g, b, 1.0f ).endVertex();
+        renderer.pos( x + FONT_WIDTH, y, 0.0 ).tex( (xStart + FONT_WIDTH) / WIDTH, yStart / WIDTH ).color( r, g, b, 1.0f ).endVertex();
+        renderer.pos( x + FONT_WIDTH, y, 0.0 ).tex( (xStart + FONT_WIDTH) / WIDTH, yStart / WIDTH ).color( r, g, b, 1.0f ).endVertex();
+        renderer.pos( x, y + FONT_HEIGHT, 0.0 ).tex( xStart / WIDTH, (yStart + FONT_HEIGHT) / WIDTH ).color( r, g, b, 1.0f ).endVertex();
+        renderer.pos( x + FONT_WIDTH, y + FONT_HEIGHT, 0.0 ).tex( (xStart + FONT_WIDTH) / WIDTH, (yStart + FONT_HEIGHT) / WIDTH ).color( r, g, b, 1.0f ).endVertex();
     }
 
     private void drawQuad( BufferBuilder renderer, double x, double y, int color, double width, Palette p, boolean greyscale )
@@ -128,9 +129,9 @@ public final class FixedWidthFontRenderer
             }
             drawQuad( renderer, x + i * FONT_WIDTH, y, colour, FONT_WIDTH, p, greyScale );
         }
-        GlStateManager.disableTexture();
+        RenderSystem.disableTexture();
         tessellator.draw();
-        GlStateManager.enableTexture();
+        RenderSystem.enableTexture();
     }
 
     public void drawStringTextPart( int x, int y, TextBuffer s, TextBuffer textColour, boolean greyScale, Palette p )
@@ -194,6 +195,6 @@ public final class FixedWidthFontRenderer
     public void bindFont()
     {
         m_textureManager.bindTexture( FONT );
-        GlStateManager.texParameter( GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP );
+        RenderSystem.texParameter( GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP );
     }
 }

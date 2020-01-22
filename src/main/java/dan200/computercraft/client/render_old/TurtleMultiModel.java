@@ -6,6 +6,7 @@
 package dan200.computercraft.client.render;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.TransformationMatrix;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemOverrideList;
@@ -22,15 +23,19 @@ public class TurtleMultiModel implements IBakedModel
 {
     private final IBakedModel m_baseModel;
     private final IBakedModel m_overlayModel;
-    private final Matrix4f m_generalTransform;
+    private final TransformationMatrix m_generalTransform;
     private final IBakedModel m_leftUpgradeModel;
-    private final Matrix4f m_leftUpgradeTransform;
+    private final TransformationMatrix m_leftUpgradeTransform;
     private final IBakedModel m_rightUpgradeModel;
-    private final Matrix4f m_rightUpgradeTransform;
+    private final TransformationMatrix m_rightUpgradeTransform;
     private List<BakedQuad> m_generalQuads = null;
     private Map<Direction, List<BakedQuad>> m_faceQuads = new EnumMap<>( Direction.class );
 
-    public TurtleMultiModel( IBakedModel baseModel, IBakedModel overlayModel, Matrix4f generalTransform, IBakedModel leftUpgradeModel, Matrix4f leftUpgradeTransform, IBakedModel rightUpgradeModel, Matrix4f rightUpgradeTransform )
+    public TurtleMultiModel(
+        IBakedModel baseModel, IBakedModel overlayModel, TransformationMatrix generalTransform,
+        IBakedModel leftUpgradeModel, TransformationMatrix leftUpgradeTransform,
+        IBakedModel rightUpgradeModel, TransformationMatrix rightUpgradeTransform
+    )
     {
         // Get the models
         m_baseModel = baseModel;
@@ -76,17 +81,17 @@ public class TurtleMultiModel implements IBakedModel
         }
         if( m_leftUpgradeModel != null )
         {
-            Matrix4f upgradeTransform = m_generalTransform;
+            TransformationMatrix upgradeTransform = m_generalTransform;
             if( m_leftUpgradeTransform != null )
             {
-                upgradeTransform = new Matrix4f( m_generalTransform );
+                upgradeTransform = new TransformationMatrix( m_generalTransform );
                 upgradeTransform.mul( m_leftUpgradeTransform );
             }
             ModelTransformer.transformQuadsTo( quads, m_leftUpgradeModel.getQuads( state, side, rand, EmptyModelData.INSTANCE ), upgradeTransform );
         }
         if( m_rightUpgradeModel != null )
         {
-            Matrix4f upgradeTransform = m_generalTransform;
+            TransformationMatrix upgradeTransform = m_generalTransform;
             if( m_rightUpgradeTransform != null )
             {
                 upgradeTransform = new Matrix4f( m_generalTransform );

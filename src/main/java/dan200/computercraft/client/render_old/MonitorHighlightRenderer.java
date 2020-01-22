@@ -6,6 +6,7 @@
 package dan200.computercraft.client.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.peripheral.monitor.TileMonitor;
 import net.minecraft.client.Minecraft;
@@ -15,12 +16,10 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.client.event.DrawHighlightEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.opengl.GL11;
@@ -39,15 +38,12 @@ public final class MonitorHighlightRenderer
     }
 
     @SubscribeEvent
-    public static void drawHighlight( DrawBlockHighlightEvent event )
+    public static void drawHighlight( DrawHighlightEvent.HighlightBlock event )
     {
-        if( event.getTarget().getType() != RayTraceResult.Type.BLOCK || event.getInfo().getRenderViewEntity().isSneaking() )
-        {
-            return;
-        }
+        if( event.getInfo().getRenderViewEntity().isCrouching() ) return;
 
         World world = event.getInfo().getRenderViewEntity().getEntityWorld();
-        BlockPos pos = ((BlockRayTraceResult) event.getTarget()).getPos();
+        BlockPos pos = event.getTarget().getPos();
 
         TileEntity tile = world.getTileEntity( pos );
         if( !(tile instanceof TileMonitor) ) return;
@@ -64,15 +60,15 @@ public final class MonitorHighlightRenderer
         if( monitor.getYIndex() != 0 ) faces.remove( monitor.getDown().getOpposite() );
         if( monitor.getYIndex() != monitor.getHeight() - 1 ) faces.remove( monitor.getDown() );
 
-        GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate( GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO );
-        GlStateManager.lineWidth( Math.max( 2.5F, (float) Minecraft.getInstance().mainWindow.getFramebufferWidth() / 1920.0F * 2.5F ) );
-        GlStateManager.disableTexture();
-        GlStateManager.depthMask( false );
-        GlStateManager.pushMatrix();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate( GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO );
+        RenderSystem.lineWidth( Math.max( 2.5F, (float) Minecraft.getInstance().getMainWindow().getFramebufferWidth() / 1920.0F * 2.5F ) );
+        RenderSystem.disableTexture();
+        RenderSystem.depthMask( false );
+        RenderSystem.pushMatrix();
 
         Vec3d cameraPos = event.getInfo().getProjectedView();
-        GlStateManager.translated( pos.getX() - cameraPos.getX(), pos.getY() - cameraPos.getY(), pos.getZ() - cameraPos.getZ() );
+        RenderSystem.translated( pos.getX() - cameraPos.getX(), pos.getY() - cameraPos.getY(), pos.getZ() - cameraPos.getZ() );
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -94,10 +90,10 @@ public final class MonitorHighlightRenderer
 
         tessellator.draw();
 
-        GlStateManager.popMatrix();
-        GlStateManager.depthMask( true );
-        GlStateManager.enableTexture();
-        GlStateManager.disableBlend();
+        RenderSystem.popMatrix();
+        RenderSystem.depthMask( true );
+        RenderSystem.enableTexture();
+        RenderSystem.disableBlend();
     }
 
     private static void line( BufferBuilder buffer, int x, int y, int z, Direction direction )

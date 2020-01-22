@@ -5,7 +5,7 @@
  */
 package dan200.computercraft.client.render;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.client.FrameInfo;
 import dan200.computercraft.client.gui.FixedWidthFontRenderer;
@@ -79,18 +79,18 @@ public final class ItemPocketRenderer extends ItemMapLikeRenderer
 
         // Setup various transformations. Note that these are partially adapted from the corresponding method
         // in ItemRenderer
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
 
-        GlStateManager.disableLighting();
-        GlStateManager.disableDepthTest();
+        RenderSystem.disableLighting();
+        RenderSystem.disableDepthTest();
 
-        GlStateManager.rotatef( 180f, 0f, 1f, 0f );
-        GlStateManager.rotatef( 180f, 0f, 0f, 1f );
-        GlStateManager.scalef( 0.5f, 0.5f, 0.5f );
+        RenderSystem.rotatef( 180f, 0f, 1f, 0f );
+        RenderSystem.rotatef( 180f, 0f, 0f, 1f );
+        RenderSystem.scalef( 0.5f, 0.5f, 0.5f );
 
         double scale = 0.75 / Math.max( width + FRAME * 2, height + FRAME * 2 + LIGHT_HEIGHT );
-        GlStateManager.scaled( scale, scale, 0 );
-        GlStateManager.translated( -0.5 * width, -0.5 * height, 0 );
+        RenderSystem.scaled( scale, scale, 0 );
+        RenderSystem.translated( -0.5 * width, -0.5 * height, 0 );
 
         // Render the main frame
         ItemPocketComputer item = (ItemPocketComputer) stack.getItem();
@@ -122,9 +122,9 @@ public final class ItemPocketRenderer extends ItemMapLikeRenderer
             tessellator.draw();
         }
 
-        GlStateManager.enableDepthTest();
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableLighting();
+        RenderSystem.popMatrix();
     }
 
     private static void renderFrame( ComputerFamily family, int colour, int width, int height )
@@ -171,8 +171,8 @@ public final class ItemPocketRenderer extends ItemMapLikeRenderer
 
     private static void renderLight( int colour, int width, int height )
     {
-        GlStateManager.enableBlend();
-        GlStateManager.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.disableTexture();
 
         float r = ((colour >>> 16) & 0xFF) / 255.0f;
         float g = ((colour >>> 8) & 0xFF) / 255.0f;
@@ -187,7 +187,7 @@ public final class ItemPocketRenderer extends ItemMapLikeRenderer
         buffer.pos( width - LIGHT_HEIGHT * 2, height + FRAME / 2.0f, 0.0D ).color( r, g, b, 1.0f ).endVertex();
 
         tessellator.draw();
-        GlStateManager.enableTexture();
+        RenderSystem.enableTexture();
     }
 
     private static void renderTerminal( Terminal terminal, boolean greyscale, int width, int height )

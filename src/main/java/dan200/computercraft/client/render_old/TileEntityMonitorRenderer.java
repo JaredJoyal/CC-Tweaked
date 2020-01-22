@@ -6,7 +6,7 @@
 package dan200.computercraft.client.render;
 
 import com.mojang.blaze3d.platform.GLX;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import dan200.computercraft.client.FrameInfo;
 import dan200.computercraft.client.gui.FixedWidthFontRenderer;
 import dan200.computercraft.core.terminal.Terminal;
@@ -68,14 +68,14 @@ public class TileEntityMonitorRenderer extends TileEntityRenderer<TileMonitor>
         float yaw = dir.getHorizontalAngle();
         float pitch = DirectionUtil.toPitchAngle( front );
 
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
         try
         {
             // Setup initial transform
-            GlStateManager.translated( posX + 0.5, posY + 0.5, posZ + 0.5 );
-            GlStateManager.rotatef( -yaw, 0.0f, 1.0f, 0.0f );
-            GlStateManager.rotatef( pitch, 1.0f, 0.0f, 0.0f );
-            GlStateManager.translated(
+            RenderSystem.translated( posX + 0.5, posY + 0.5, posZ + 0.5 );
+            RenderSystem.rotatef( -yaw, 0.0f, 1.0f, 0.0f );
+            RenderSystem.rotatef( pitch, 1.0f, 0.0f, 0.0f );
+            RenderSystem.translated(
                 -0.5 + TileMonitor.RENDER_BORDER + TileMonitor.RENDER_MARGIN,
                 origin.getHeight() - 0.5 - (TileMonitor.RENDER_BORDER + TileMonitor.RENDER_MARGIN) + 0,
                 0.5
@@ -92,9 +92,9 @@ public class TileEntityMonitorRenderer extends TileEntityRenderer<TileMonitor>
             boolean redraw = originTerminal.pollTerminalChanged();
 
             // Draw the contents
-            GlStateManager.depthMask( false );
+            RenderSystem.depthMask( false );
             GLX.glMultiTexCoord2f( GLX.GL_TEXTURE1, 0xFFFF, 0xFFFF );
-            GlStateManager.disableLighting();
+            RenderSystem.disableLighting();
             mc.gameRenderer.disableLightmap();
             try
             {
@@ -118,19 +118,19 @@ public class TileEntityMonitorRenderer extends TileEntityRenderer<TileMonitor>
                     int cursorY = terminal.getCursorY();
                     FixedWidthFontRenderer fontRenderer = FixedWidthFontRenderer.instance();
 
-                    GlStateManager.pushMatrix();
+                    RenderSystem.pushMatrix();
                     try
                     {
                         double xScale = xSize / (width * FixedWidthFontRenderer.FONT_WIDTH);
                         double yScale = ySize / (height * FixedWidthFontRenderer.FONT_HEIGHT);
-                        GlStateManager.scaled( xScale, -yScale, 1.0 );
+                        RenderSystem.scaled( xScale, -yScale, 1.0 );
 
                         // Draw background
                         mc.getTextureManager().bindTexture( FixedWidthFontRenderer.BACKGROUND );
                         if( redraw )
                         {
                             // Build background display list
-                            GlStateManager.newList( originTerminal.renderDisplayLists[0], GL11.GL_COMPILE );
+                            RenderSystem.newList( originTerminal.renderDisplayLists[0], GL11.GL_COMPILE );
                             try
                             {
                                 double marginXSize = TileMonitor.RENDER_MARGIN / xScale;
@@ -138,18 +138,18 @@ public class TileEntityMonitorRenderer extends TileEntityRenderer<TileMonitor>
                                 double marginSquash = marginYSize / FixedWidthFontRenderer.FONT_HEIGHT;
 
                                 // Top and bottom margins
-                                GlStateManager.pushMatrix();
+                                RenderSystem.pushMatrix();
                                 try
                                 {
-                                    GlStateManager.scaled( 1.0, marginSquash, 1.0 );
-                                    GlStateManager.translated( 0.0, -marginYSize / marginSquash, 0.0 );
+                                    RenderSystem.scaled( 1.0, marginSquash, 1.0 );
+                                    RenderSystem.translated( 0.0, -marginYSize / marginSquash, 0.0 );
                                     fontRenderer.drawStringBackgroundPart( 0, 0, terminal.getBackgroundColourLine( 0 ), marginXSize, marginXSize, greyscale, palette );
-                                    GlStateManager.translated( 0.0, (marginYSize + height * FixedWidthFontRenderer.FONT_HEIGHT) / marginSquash, 0.0 );
+                                    RenderSystem.translated( 0.0, (marginYSize + height * FixedWidthFontRenderer.FONT_HEIGHT) / marginSquash, 0.0 );
                                     fontRenderer.drawStringBackgroundPart( 0, 0, terminal.getBackgroundColourLine( height - 1 ), marginXSize, marginXSize, greyscale, palette );
                                 }
                                 finally
                                 {
-                                    GlStateManager.popMatrix();
+                                    RenderSystem.popMatrix();
                                 }
 
                                 // Backgrounds
@@ -166,18 +166,18 @@ public class TileEntityMonitorRenderer extends TileEntityRenderer<TileMonitor>
                             }
                             finally
                             {
-                                GlStateManager.endList();
+                                RenderSystem.endList();
                             }
                         }
-                        GlStateManager.callList( originTerminal.renderDisplayLists[0] );
-                        GlStateManager.clearCurrentColor();
+                        RenderSystem.callList( originTerminal.renderDisplayLists[0] );
+                        RenderSystem.clearCurrentColor();
 
                         // Draw text
                         fontRenderer.bindFont();
                         if( redraw )
                         {
                             // Build text display list
-                            GlStateManager.newList( originTerminal.renderDisplayLists[1], GL11.GL_COMPILE );
+                            RenderSystem.newList( originTerminal.renderDisplayLists[1], GL11.GL_COMPILE );
                             try
                             {
                                 // Lines
@@ -194,18 +194,18 @@ public class TileEntityMonitorRenderer extends TileEntityRenderer<TileMonitor>
                             }
                             finally
                             {
-                                GlStateManager.endList();
+                                RenderSystem.endList();
                             }
                         }
-                        GlStateManager.callList( originTerminal.renderDisplayLists[1] );
-                        GlStateManager.clearCurrentColor();
+                        RenderSystem.callList( originTerminal.renderDisplayLists[1] );
+                        RenderSystem.clearCurrentColor();
 
                         // Draw cursor
                         fontRenderer.bindFont();
                         if( redraw )
                         {
                             // Build cursor display list
-                            GlStateManager.newList( originTerminal.renderDisplayLists[2], GL11.GL_COMPILE );
+                            RenderSystem.newList( originTerminal.renderDisplayLists[2], GL11.GL_COMPILE );
                             try
                             {
                                 // Cursor
@@ -226,18 +226,18 @@ public class TileEntityMonitorRenderer extends TileEntityRenderer<TileMonitor>
                             }
                             finally
                             {
-                                GlStateManager.endList();
+                                RenderSystem.endList();
                             }
                         }
                         if( FrameInfo.getGlobalCursorBlink() )
                         {
-                            GlStateManager.callList( originTerminal.renderDisplayLists[2] );
-                            GlStateManager.clearCurrentColor();
+                            RenderSystem.callList( originTerminal.renderDisplayLists[2] );
+                            RenderSystem.clearCurrentColor();
                         }
                     }
                     finally
                     {
-                        GlStateManager.popMatrix();
+                        RenderSystem.popMatrix();
                     }
                 }
                 else
@@ -251,22 +251,22 @@ public class TileEntityMonitorRenderer extends TileEntityRenderer<TileMonitor>
                     final float b = colour.getB();
 
                     renderer.begin( GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR );
-                    renderer.pos( -TileMonitor.RENDER_MARGIN, TileMonitor.RENDER_MARGIN, 0.0D ).tex( 0.0, 0.0 ).color( r, g, b, 1.0f ).endVertex();
-                    renderer.pos( -TileMonitor.RENDER_MARGIN, -ySize - TileMonitor.RENDER_MARGIN, 0.0 ).tex( 0.0, 1.0 ).color( r, g, b, 1.0f ).endVertex();
-                    renderer.pos( xSize + TileMonitor.RENDER_MARGIN, TileMonitor.RENDER_MARGIN, 0.0D ).tex( 1.0, 0.0 ).color( r, g, b, 1.0f ).endVertex();
-                    renderer.pos( xSize + TileMonitor.RENDER_MARGIN, -ySize - TileMonitor.RENDER_MARGIN, 0.0 ).tex( 1.0, 1.0 ).color( r, g, b, 1.0f ).endVertex();
+                    renderer.pos( -TileMonitor.RENDER_MARGIN, TileMonitor.RENDER_MARGIN, 0.0D ).tex( 0.0f, 0.0f ).color( r, g, b, 1.0f ).endVertex();
+                    renderer.pos( -TileMonitor.RENDER_MARGIN, -ySize - TileMonitor.RENDER_MARGIN, 0.0 ).tex( 0.0f, 1.0f ).color( r, g, b, 1.0f ).endVertex();
+                    renderer.pos( xSize + TileMonitor.RENDER_MARGIN, TileMonitor.RENDER_MARGIN, 0.0D ).tex( 1.0f, 0.0f ).color( r, g, b, 1.0f ).endVertex();
+                    renderer.pos( xSize + TileMonitor.RENDER_MARGIN, -ySize - TileMonitor.RENDER_MARGIN, 0.0 ).tex( 1.0f, 1.0f ).color( r, g, b, 1.0f ).endVertex();
                     tessellator.draw();
                 }
             }
             finally
             {
-                GlStateManager.depthMask( true );
+                RenderSystem.depthMask( true );
                 mc.gameRenderer.enableLightmap();
-                GlStateManager.enableLighting();
+                RenderSystem.enableLighting();
             }
 
             // Draw the depth blocker
-            GlStateManager.colorMask( false, false, false, false );
+            RenderSystem.colorMask( false, false, false, false );
             try
             {
                 mc.getTextureManager().bindTexture( FixedWidthFontRenderer.BACKGROUND );
@@ -279,13 +279,13 @@ public class TileEntityMonitorRenderer extends TileEntityRenderer<TileMonitor>
             }
             finally
             {
-                GlStateManager.colorMask( true, true, true, true );
+                RenderSystem.colorMask( true, true, true, true );
             }
         }
         finally
         {
-            GlStateManager.color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-            GlStateManager.popMatrix();
+            RenderSystem.color4f( 1.0f, 1.0f, 1.0f, 1.0f );
+            RenderSystem.popMatrix();
         }
     }
 }

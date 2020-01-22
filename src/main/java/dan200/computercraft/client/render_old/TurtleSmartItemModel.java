@@ -13,6 +13,8 @@ import dan200.computercraft.shared.util.Holiday;
 import dan200.computercraft.shared.util.HolidayUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.TransformationMatrix;
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.LivingEntity;
@@ -25,24 +27,22 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.vecmath.Matrix4f;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 public class TurtleSmartItemModel implements IBakedModel
 {
-    private static final Matrix4f s_identity, s_flip;
+    private static final TransformationMatrix identity, flip;
 
     static
     {
-        s_identity = new Matrix4f();
-        s_identity.setIdentity();
+        Matrix4f flipMatrix = new Matrix4f();
+        flipMatrix.m11 = -1; // Flip on the y axis
+        flipMatrix.m13 = 1; // Models go from (0,0,0) to (1,1,1), so push back up.
 
-        s_flip = new Matrix4f();
-        s_flip.setIdentity();
-        s_flip.m11 = -1; // Flip on the y axis
-        s_flip.m13 = 1; // Models go from (0,0,0) to (1,1,1), so push back up.
+        identity = TransformationMatrix.func_227983_a_();
+        flip = new TransformationMatrix( flipMatrix );
     }
 
     private static class TurtleModelCombination
@@ -144,9 +144,9 @@ public class TurtleSmartItemModel implements IBakedModel
 
         IBakedModel baseModel = combo.m_colour ? colourModel : familyModel;
         IBakedModel overlayModel = overlayModelLocation != null ? modelManager.getModel( overlayModelLocation ) : null;
-        Matrix4f transform = combo.m_flip ? s_flip : s_identity;
-        Pair<IBakedModel, Matrix4f> leftModel = combo.m_leftUpgrade != null ? combo.m_leftUpgrade.getModel( null, TurtleSide.Left ) : null;
-        Pair<IBakedModel, Matrix4f> rightModel = combo.m_rightUpgrade != null ? combo.m_rightUpgrade.getModel( null, TurtleSide.Right ) : null;
+        TransformationMatrix transform = combo.m_flip ? flip : identity;
+        Pair<IBakedModel, TransformationMatrix> leftModel = combo.m_leftUpgrade != null ? combo.m_leftUpgrade.getModel( null, TurtleSide.Left ) : null;
+        Pair<IBakedModel, TransformationMatrix> rightModel = combo.m_rightUpgrade != null ? combo.m_rightUpgrade.getModel( null, TurtleSide.Right ) : null;
         if( leftModel != null && rightModel != null )
         {
             return new TurtleMultiModel( baseModel, overlayModel, transform, leftModel.getLeft(), leftModel.getRight(), rightModel.getLeft(), rightModel.getRight() );

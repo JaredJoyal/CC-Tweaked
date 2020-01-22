@@ -20,6 +20,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.TransformationMatrix;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -42,7 +44,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
-import javax.vecmath.Matrix4f;
 import java.util.List;
 import java.util.function.Function;
 
@@ -71,19 +72,19 @@ public class TurtleTool extends AbstractTurtleUpgrade
     @Nonnull
     @Override
     @OnlyIn( Dist.CLIENT )
-    public Pair<IBakedModel, Matrix4f> getModel( ITurtleAccess turtle, @Nonnull TurtleSide side )
+    public Pair<IBakedModel, TransformationMatrix> getModel( ITurtleAccess turtle, @Nonnull TurtleSide side )
     {
         float xOffset = side == TurtleSide.Left ? -0.40625f : 0.40625f;
-        Matrix4f transform = new Matrix4f(
+        Matrix4f transform = new Matrix4f( new float[] {
             0.0f, 0.0f, -1.0f, 1.0f + xOffset,
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, -1.0f, 0.0f, 1.0f,
             0.0f, 0.0f, 0.0f, 1.0f
-        );
+        } );
         Minecraft mc = Minecraft.getInstance();
         return Pair.of(
             mc.getItemRenderer().getItemModelMesher().getItemModel( getCraftingItem() ),
-            transform
+            new TransformationMatrix( transform )
         );
     }
 
@@ -124,7 +125,7 @@ public class TurtleTool extends AbstractTurtleUpgrade
         final TurtlePlayer turtlePlayer = TurtlePlaceCommand.createPlayer( turtle, position, direction );
 
         // See if there is an entity present
-        Vec3d turtlePos = new Vec3d( turtlePlayer.posX, turtlePlayer.posY, turtlePlayer.posZ );
+        Vec3d turtlePos = turtlePlayer.getPositionVec();
         Vec3d rayDir = turtlePlayer.getLook( 1.0f );
         Pair<Entity, Vec3d> hit = WorldUtil.rayTraceEntities( world, turtlePos, rayDir, 1.5 );
         if( hit != null )

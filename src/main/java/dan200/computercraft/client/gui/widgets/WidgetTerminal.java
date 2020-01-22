@@ -5,7 +5,7 @@
  */
 package dan200.computercraft.client.gui.widgets;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import dan200.computercraft.client.FrameInfo;
 import dan200.computercraft.client.gui.FixedWidthFontRenderer;
 import dan200.computercraft.core.terminal.Terminal;
@@ -26,7 +26,7 @@ import org.lwjgl.opengl.GL11;
 import java.util.BitSet;
 import java.util.function.Supplier;
 
-import static dan200.computercraft.client.gui.FixedWidthFontRenderer.BACKGROUND;
+import static dan200.computercraft.client.gui.FixedWidthFontRenderer.*;
 
 public class WidgetTerminal implements IGuiEventListener
 {
@@ -184,8 +184,8 @@ public class WidgetTerminal implements IGuiEventListener
         Terminal term = computer.getTerminal();
         if( term != null )
         {
-            int charX = (int) (mouseX / FixedWidthFontRenderer.FONT_WIDTH);
-            int charY = (int) (mouseY / FixedWidthFontRenderer.FONT_HEIGHT);
+            int charX = (int) (mouseX / FONT_WIDTH);
+            int charY = (int) (mouseY / FONT_HEIGHT);
             charX = Math.min( Math.max( charX, 0 ), term.getWidth() - 1 );
             charY = Math.min( Math.max( charY, 0 ), term.getHeight() - 1 );
 
@@ -208,8 +208,8 @@ public class WidgetTerminal implements IGuiEventListener
         Terminal term = computer.getTerminal();
         if( term != null )
         {
-            int charX = (int) (mouseX / FixedWidthFontRenderer.FONT_WIDTH);
-            int charY = (int) (mouseY / FixedWidthFontRenderer.FONT_HEIGHT);
+            int charX = (int) (mouseX / FONT_WIDTH);
+            int charY = (int) (mouseY / FONT_HEIGHT);
             charX = Math.min( Math.max( charX, 0 ), term.getWidth() - 1 );
             charY = Math.min( Math.max( charY, 0 ), term.getHeight() - 1 );
 
@@ -235,8 +235,8 @@ public class WidgetTerminal implements IGuiEventListener
         Terminal term = computer.getTerminal();
         if( term != null )
         {
-            int charX = (int) (mouseX / FixedWidthFontRenderer.FONT_WIDTH);
-            int charY = (int) (mouseY / FixedWidthFontRenderer.FONT_HEIGHT);
+            int charX = (int) (mouseX / FONT_WIDTH);
+            int charY = (int) (mouseY / FONT_HEIGHT);
             charX = Math.min( Math.max( charX, 0 ), term.getWidth() - 1 );
             charY = Math.min( Math.max( charY, 0 ), term.getHeight() - 1 );
 
@@ -260,8 +260,8 @@ public class WidgetTerminal implements IGuiEventListener
         Terminal term = computer.getTerminal();
         if( term != null )
         {
-            int charX = (int) (mouseX / FixedWidthFontRenderer.FONT_WIDTH);
-            int charY = (int) (mouseY / FixedWidthFontRenderer.FONT_HEIGHT);
+            int charX = (int) (mouseX / FONT_WIDTH);
+            int charY = (int) (mouseY / FONT_HEIGHT);
             charX = Math.min( Math.max( charX, 0 ), term.getWidth() - 1 );
             charY = Math.min( Math.max( charY, 0 ), term.getHeight() - 1 );
 
@@ -353,7 +353,7 @@ public class WidgetTerminal implements IGuiEventListener
 
                 if( bottomMargin > 0 )
                 {
-                    fontRenderer.drawString( emptyLine, originX, originY + bottomMargin + (th - 1) * FixedWidthFontRenderer.FONT_HEIGHT,
+                    fontRenderer.drawString( emptyLine, originX, originY + bottomMargin + (th - 1) * FONT_HEIGHT,
                         terminal.getTextColourLine( th - 1 ), terminal.getBackgroundColourLine( th - 1 ),
                         leftMargin, rightMargin, greyscale, palette );
                 }
@@ -366,7 +366,7 @@ public class WidgetTerminal implements IGuiEventListener
                     TextBuffer colour = terminal.getTextColourLine( line );
                     TextBuffer backgroundColour = terminal.getBackgroundColourLine( line );
                     fontRenderer.drawString( text, originX, y, colour, backgroundColour, leftMargin, rightMargin, greyscale, palette );
-                    y += FixedWidthFontRenderer.FONT_HEIGHT;
+                    y += FONT_HEIGHT;
                 }
 
                 if( tblink && tx >= 0 && ty >= 0 && tx < tw && ty < th )
@@ -376,8 +376,8 @@ public class WidgetTerminal implements IGuiEventListener
 
                     fontRenderer.drawString(
                         cursor,
-                        originX + FixedWidthFontRenderer.FONT_WIDTH * tx,
-                        originY + FixedWidthFontRenderer.FONT_HEIGHT * ty,
+                        originX + FONT_WIDTH * tx,
+                        originY + FONT_HEIGHT * ty,
                         cursorColour, null,
                         0, 0,
                         greyscale,
@@ -389,28 +389,28 @@ public class WidgetTerminal implements IGuiEventListener
             {
                 // Draw a black background
                 Colour black = Colour.Black;
-                GlStateManager.color4f( black.getR(), black.getG(), black.getB(), 1.0f );
+                RenderSystem.color4f( black.getR(), black.getG(), black.getB(), 1.0f );
                 try
                 {
                     int x = originX - leftMargin;
                     int y = originY - rightMargin;
-                    int width = termWidth * FixedWidthFontRenderer.FONT_WIDTH + leftMargin + rightMargin;
-                    int height = termHeight * FixedWidthFontRenderer.FONT_HEIGHT + topMargin + bottomMargin;
+                    int width = termWidth * FONT_WIDTH + leftMargin + rightMargin;
+                    int height = termHeight * FONT_HEIGHT + topMargin + bottomMargin;
 
                     client.getTextureManager().bindTexture( BACKGROUND );
 
                     Tessellator tesslector = Tessellator.getInstance();
                     BufferBuilder buffer = tesslector.getBuffer();
                     buffer.begin( GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX );
-                    buffer.pos( x, y + height, 0 ).tex( 0 / 256.0, height / 256.0 ).endVertex();
-                    buffer.pos( x + width, y + height, 0 ).tex( width / 256.0, height / 256.0 ).endVertex();
-                    buffer.pos( x + width, y, 0 ).tex( width / 256.0, 0 / 256.0 ).endVertex();
-                    buffer.pos( x, y, 0 ).tex( 0 / 256.0, 0 / 256.0 ).endVertex();
+                    buffer.pos( x, y + height, 0 ).tex( 0 / WIDTH, height / WIDTH ).endVertex();
+                    buffer.pos( x + width, y + height, 0 ).tex( width / WIDTH, height / WIDTH ).endVertex();
+                    buffer.pos( x + width, y, 0 ).tex( width / WIDTH, 0 / WIDTH ).endVertex();
+                    buffer.pos( x, y, 0 ).tex( 0 / WIDTH, 0 / WIDTH ).endVertex();
                     tesslector.draw();
                 }
                 finally
                 {
-                    GlStateManager.color4f( 1.0f, 1.0f, 1.0f, 1.0f );
+                    RenderSystem.color4f( 1.0f, 1.0f, 1.0f, 1.0f );
                 }
             }
         }

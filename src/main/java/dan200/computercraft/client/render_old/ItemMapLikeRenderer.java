@@ -5,7 +5,7 @@
  */
 package dan200.computercraft.client.render;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FirstPersonRenderer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,7 +28,7 @@ public abstract class ItemMapLikeRenderer
     {
         PlayerEntity player = Minecraft.getInstance().player;
 
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
         if( hand == Hand.MAIN_HAND && player.getHeldItemOffhand().isEmpty() )
         {
             renderItemFirstPersonCenter( pitch, equipProgress, swingProgress, stack );
@@ -40,7 +40,7 @@ public abstract class ItemMapLikeRenderer
                 equipProgress, swingProgress, stack
             );
         }
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     /**
@@ -56,33 +56,33 @@ public abstract class ItemMapLikeRenderer
     {
         Minecraft minecraft = Minecraft.getInstance();
         float offset = side == HandSide.RIGHT ? 1f : -1f;
-        GlStateManager.translatef( offset * 0.125f, -0.125f, 0f );
+        RenderSystem.translatef( offset * 0.125f, -0.125f, 0f );
 
         // If the player is not invisible then render a single arm
         if( !minecraft.player.isInvisible() )
         {
-            GlStateManager.pushMatrix();
-            GlStateManager.rotatef( offset * 10f, 0f, 0f, 1f );
+            RenderSystem.pushMatrix();
+            RenderSystem.rotatef( offset * 10f, 0f, 0f, 1f );
             minecraft.getFirstPersonRenderer().renderArmFirstPerson( equipProgress, swingProgress, side );
-            GlStateManager.popMatrix();
+            RenderSystem.popMatrix();
         }
 
         // Setup the appropriate transformations. This is just copied from the
         // corresponding method in ItemRenderer.
-        GlStateManager.pushMatrix();
-        GlStateManager.translatef( offset * 0.51f, -0.08f + equipProgress * -1.2f, -0.75f );
+        RenderSystem.pushMatrix();
+        RenderSystem.translatef( offset * 0.51f, -0.08f + equipProgress * -1.2f, -0.75f );
         float f1 = MathHelper.sqrt( swingProgress );
         float f2 = MathHelper.sin( f1 * (float) Math.PI );
         float f3 = -0.5f * f2;
         float f4 = 0.4f * MathHelper.sin( f1 * ((float) Math.PI * 2f) );
         float f5 = -0.3f * MathHelper.sin( swingProgress * (float) Math.PI );
-        GlStateManager.translatef( offset * f3, f4 - 0.3f * f2, f5 );
-        GlStateManager.rotatef( f2 * -45f, 1f, 0f, 0f );
-        GlStateManager.rotatef( offset * f2 * -30f, 0f, 1f, 0f );
+        RenderSystem.translatef( offset * f3, f4 - 0.3f * f2, f5 );
+        RenderSystem.rotatef( f2 * -45f, 1f, 0f, 0f );
+        RenderSystem.rotatef( offset * f2 * -30f, 0f, 1f, 0f );
 
         renderItem( stack );
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     /**
@@ -103,14 +103,14 @@ public abstract class ItemMapLikeRenderer
         float swingRt = MathHelper.sqrt( swingProgress );
         float tX = -0.2f * MathHelper.sin( swingProgress * (float) Math.PI );
         float tZ = -0.4f * MathHelper.sin( swingRt * (float) Math.PI );
-        GlStateManager.translatef( 0f, -tX / 2f, tZ );
+        RenderSystem.translatef( 0f, -tX / 2f, tZ );
         float pitchAngle = renderer.getMapAngleFromPitch( pitch );
-        GlStateManager.translatef( 0f, 0.04f + equipProgress * -1.2f + pitchAngle * -0.5f, -0.72f );
-        GlStateManager.rotatef( pitchAngle * -85f, 1f, 0f, 0f );
+        RenderSystem.translatef( 0f, 0.04f + equipProgress * -1.2f + pitchAngle * -0.5f, -0.72f );
+        RenderSystem.rotatef( pitchAngle * -85f, 1f, 0f, 0f );
         renderer.renderArms();
         float rX = MathHelper.sin( swingRt * (float) Math.PI );
-        GlStateManager.rotatef( rX * 20f, 1f, 0f, 0f );
-        GlStateManager.scalef( 2f, 2f, 2f );
+        RenderSystem.rotatef( rX * 20f, 1f, 0f, 0f );
+        RenderSystem.scalef( 2f, 2f, 2f );
 
         renderItem( stack );
     }

@@ -12,6 +12,7 @@ import dan200.computercraft.api.turtle.TurtleSide;
 import dan200.computercraft.api.turtle.TurtleUpgradeType;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.TransformationMatrix;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelManager;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
@@ -21,7 +22,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
-import javax.vecmath.Matrix4f;
 
 public class TurtleCraftingTable extends AbstractTurtleUpgrade
 {
@@ -55,19 +55,11 @@ public class TurtleCraftingTable extends AbstractTurtleUpgrade
     @Nonnull
     @Override
     @OnlyIn( Dist.CLIENT )
-    public Pair<IBakedModel, Matrix4f> getModel( ITurtleAccess turtle, @Nonnull TurtleSide side )
+    public Pair<IBakedModel, TransformationMatrix> getModel( ITurtleAccess turtle, @Nonnull TurtleSide side )
     {
         loadModelLocations();
 
-        Matrix4f transform = null;
         ModelManager modelManager = Minecraft.getInstance().getItemRenderer().getItemModelMesher().getModelManager();
-        if( side == TurtleSide.Left )
-        {
-            return Pair.of( modelManager.getModel( m_leftModel ), transform );
-        }
-        else
-        {
-            return Pair.of( modelManager.getModel( m_rightModel ), transform );
-        }
+        return Pair.of( modelManager.getModel( side == TurtleSide.Left ? m_leftModel : m_rightModel ), null );
     }
 }

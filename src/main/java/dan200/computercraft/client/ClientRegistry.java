@@ -6,25 +6,21 @@
 package dan200.computercraft.client;
 
 import dan200.computercraft.ComputerCraft;
-import dan200.computercraft.client.render.TurtleModelLoader;
 import dan200.computercraft.shared.common.IColouredItem;
 import dan200.computercraft.shared.media.items.ItemDisk;
 import dan200.computercraft.shared.pocket.items.ItemPocketComputer;
 import dan200.computercraft.shared.util.Colour;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.BasicState;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.SimpleModelTransform;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -71,13 +67,13 @@ public final class ClientRegistry
     @SubscribeEvent
     public static void registerModels( ModelRegistryEvent event )
     {
-        ModelLoaderRegistry.registerLoader( TurtleModelLoader.INSTANCE );
+        // TODO: ModelLoaderRegistry.registerLoader( new ResourceLocation( ComputerCraft.MOD_ID, "turtle" ), TurtleModelLoader.INSTANCE );
     }
 
     @SubscribeEvent
     public static void onTextureStitchEvent( TextureStitchEvent.Pre event )
     {
-        if( event.getMap() != Minecraft.getInstance().getTextureMap() ) return;
+        // TODO: if( event.getMap() != Minecraft.getInstance().getTextureManager() ) return;
 
         for( String extra : EXTRA_TEXTURES )
         {
@@ -92,29 +88,14 @@ public final class ClientRegistry
         ModelLoader loader = event.getModelLoader();
         Map<ResourceLocation, IBakedModel> registry = event.getModelRegistry();
 
-        for( String model : EXTRA_MODELS )
+        for( String modelName : EXTRA_MODELS )
         {
-            IBakedModel bakedModel = bake( loader, loader.getUnbakedModel( new ResourceLocation( ComputerCraft.MOD_ID, "item/" + model ) ) );
-
-            if( bakedModel != null )
-            {
-                registry.put(
-                    new ModelResourceLocation( new ResourceLocation( ComputerCraft.MOD_ID, model ), "inventory" ),
-                    bakedModel
-                );
-            }
+            ResourceLocation location = new ResourceLocation( ComputerCraft.MOD_ID, "item/" + modelName );
+            IUnbakedModel model = loader.getUnbakedModel( location );
+            model.func_225614_a_( loader::getUnbakedModel, new HashSet<>() );
+            IBakedModel baked = model.func_225613_a_( loader, ModelLoader.defaultTextureGetter(), SimpleModelTransform.IDENTITY, location );
+            if( baked != null ) registry.put( new ModelResourceLocation( location, "inventory" ), baked );
         }
-
-        // And load the custom turtle models in too.
-        registry.put(
-            new ModelResourceLocation( new ResourceLocation( ComputerCraft.MOD_ID, "turtle_normal" ), "inventory" ),
-            bake( loader, TurtleModelLoader.INSTANCE.loadModel( new ResourceLocation( ComputerCraft.MOD_ID, "item/turtle_normal" ) ) )
-        );
-
-        registry.put(
-            new ModelResourceLocation( new ResourceLocation( ComputerCraft.MOD_ID, "turtle_advanced" ), "inventory" ),
-            bake( loader, TurtleModelLoader.INSTANCE.loadModel( new ResourceLocation( ComputerCraft.MOD_ID, "item/turtle_advanced" ) ) )
-        );
     }
 
     @SubscribeEvent
@@ -151,17 +132,6 @@ public final class ClientRegistry
         event.getItemColors().register(
             ( stack, tintIndex ) -> tintIndex == 0 ? ((IColouredItem) stack.getItem()).getColour( stack ) : 0xFFFFFF,
             ComputerCraft.Blocks.turtleNormal, ComputerCraft.Blocks.turtleAdvanced
-        );
-    }
-
-    private static IBakedModel bake( ModelLoader loader, IUnbakedModel model )
-    {
-        model.getTextures( loader::getUnbakedModel, new HashSet<>() );
-
-        return model.bake(
-            loader,
-            ModelLoader.defaultTextureGetter(),
-            new BasicState( model.getDefaultState(), false ), DefaultVertexFormats.BLOCK
         );
     }
 }

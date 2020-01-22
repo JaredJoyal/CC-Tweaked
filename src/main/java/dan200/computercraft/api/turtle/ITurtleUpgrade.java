@@ -9,6 +9,7 @@ import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.event.TurtleAttackEvent;
 import dan200.computercraft.api.turtle.event.TurtleBlockEvent;
+import net.minecraft.client.renderer.TransformationMatrix;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
@@ -22,7 +23,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.vecmath.Matrix4f;
 
 /**
  * The primary interface for defining an update for Turtles. A turtle update
@@ -131,7 +131,7 @@ public interface ITurtleUpgrade
      */
     @Nonnull
     @OnlyIn( Dist.CLIENT )
-    Pair<IBakedModel, Matrix4f> getModel( @Nullable ITurtleAccess turtle, @Nonnull TurtleSide side );
+    Pair<IBakedModel, TransformationMatrix> getModel( @Nullable ITurtleAccess turtle, @Nonnull TurtleSide side );
 
     /**
      * Called once per tick for each turtle which has the upgrade equipped.
